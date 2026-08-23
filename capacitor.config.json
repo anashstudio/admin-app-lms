@@ -1,0 +1,6 @@
+{
+  "appId": "ir.yourorg.lmsadmin",
+  "appName": "پنل مدیریت",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
