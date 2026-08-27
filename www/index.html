@@ -11,6 +11,7 @@
 
   <!-- صفحه اتصال به سرور -->
   <div id="screen-connect" class="screen center-screen">
+    <div class="logo-mark">م</div>
     <h1 id="brandTitle">پنل مدیریت</h1>
     <p class="note" style="max-width:300px">برای اولین بار، کد اتصال سیستم را که از پنل تنظیمات وب‌سایت گرفته‌اید وارد کنید.</p>
     <div style="width:100%;max-width:300px">
@@ -22,6 +23,7 @@
 
   <!-- صفحه ورود -->
   <div id="screen-login" class="screen center-screen hidden">
+    <div class="logo-mark">م</div>
     <h1 id="loginBrand">پنل مدیریت</h1>
     <p class="note">ورود مخصوص مدیران سیستم</p>
     <div style="width:100%;max-width:300px;text-align:right">
@@ -40,15 +42,23 @@
     <div class="topbar">
       <span id="mainBrand" style="font-weight:800;font-size:14px"></span>
       <div style="display:flex;gap:10px;align-items:center">
-        <button onclick="Admin.toggleTheme()" class="btn secondary" style="padding:6px 10px;font-size:11px;border-color:rgba(244,239,228,.3);color:var(--paper)">🌓</button>
-        <button onclick="Admin.logout()" class="btn secondary" style="padding:6px 10px;font-size:11px;border-color:rgba(244,239,228,.3);color:var(--paper)">خروج</button>
+        <button onclick="Admin.toggleTheme()" class="btn secondary" style="padding:7px 11px;font-size:11px;border-color:rgba(244,239,228,.3);color:var(--paper);background:rgba(255,255,255,.06)">🌓</button>
+        <button onclick="Admin.logout()" class="btn secondary" style="padding:7px 11px;font-size:11px;border-color:rgba(244,239,228,.3);color:var(--paper);background:rgba(255,255,255,.06)">خروج</button>
       </div>
     </div>
     <div class="tabbar">
-      <button data-tab="categories" onclick="Admin.showTab('categories')" class="active">دسته‌بندی‌ها</button>
-      <button data-tab="topics" onclick="Admin.showTab('topics')">مطالب</button>
-      <button data-tab="users" onclick="Admin.showTab('users')">کاربران</button>
-      <button data-tab="settings" onclick="Admin.showTab('settings')">تنظیمات</button>
+      <button data-tab="categories" onclick="Admin.showTab('categories')" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>
+        دسته‌بندی‌ها</button>
+      <button data-tab="topics" onclick="Admin.showTab('topics')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v5h5M6 3h8l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M8 13h8M8 17h5"/></svg>
+        مطالب</button>
+      <button data-tab="users" onclick="Admin.showTab('users')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.7"/><path d="M15.5 13.2c2.7-.2 5 1.7 5.6 4"/></svg>
+        کاربران</button>
+      <button data-tab="settings" onclick="Admin.showTab('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+        تنظیمات</button>
     </div>
     <div class="screen" id="tabContent"></div>
   </div>
@@ -62,6 +72,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.7.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="app.js"></script>
 </body>
