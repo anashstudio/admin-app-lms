@@ -1,4 +1,7 @@
 const Admin = (() => {
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+  }
   let state = { url: '', key: '', token: '', user: null, categories: [] };
 
   function toast(msg) {
@@ -33,9 +36,43 @@ const Admin = (() => {
       localStorage.setItem('conn_key', state.key);
       document.getElementById('connectError').textContent = '';
       showScreen('login');
+      applyBranding();
     } catch (e) {
       document.getElementById('connectError').textContent = 'کد اتصال نامعتبر است.';
     }
+  }
+
+  async function applyBranding() {
+    try {
+      const data = await api('branding.php');
+      const b = data.branding;
+      const root = document.getElementById('htmlRoot');
+      root.style.setProperty('--gold', b.brand_primary);
+      root.style.setProperty('--deep', b.brand_primary);
+      root.style.setProperty('--gold-soft', b.brand_primary + 'cc');
+      root.style.setProperty('--gold-tint', b.brand_primary + '1a');
+      root.style.setProperty('--accent2', b.brand_secondary);
+      root.style.setProperty('--success', b.brand_secondary);
+      root.style.setProperty('--paper', b.brand_bg);
+      root.style.setProperty('--card', b.brand_surface);
+      root.style.setProperty('--ink', b.brand_text);
+      root.style.setProperty('--danger', b.brand_danger);
+      root.style.setProperty('--radius', (b.brand_radius || 18) + 'px');
+      document.body.style.fontSize = { small: '13px', medium: '14px', large: '15.5px' }[b.font_size] || '14px';
+      if (!localStorage.getItem('theme') && b.theme_default) root.setAttribute('data-theme', b.theme_default);
+
+      ['brandTitle', 'loginBrand', 'mainBrand'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = b.app_name;
+      });
+      document.title = b.app_name;
+      if (b.app_icon_url) {
+        document.querySelectorAll('.logo-mark').forEach(el => {
+          el.style.background = 'none';
+          el.innerHTML = `<img src="${b.app_icon_url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`;
+        });
+      }
+    } catch (e) { /* برندینگ اختیاری است؛ خطا نباید مانع کار اپ شود */ }
   }
 
   function resetConnection() {
@@ -106,6 +143,42 @@ const Admin = (() => {
 
   function escapeHtml(s) { return (s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
+  function decodeXmlEntities(s) {
+    return s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+  }
+  async function extractFileText(file) {
+    const ext = file.name.toLowerCase().split('.').pop();
+    if (ext === 'docx') {
+      const buf = await file.arrayBuffer();
+      return (await mammoth.extractRawText({ arrayBuffer: buf })).value;
+    }
+    if (ext === 'pdf') {
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(it => it.str).join(' ') + '\n\n';
+      }
+      return text.trim();
+    }
+    if (ext === 'pptx') {
+      const zip = await JSZip.loadAsync(file);
+      const slideNames = Object.keys(zip.files)
+        .filter(n => /^ppt\/slides\/slide\d+\.xml$/.test(n))
+        .sort((a, b) => parseInt(a.match(/slide(\d+)/)[1]) - parseInt(b.match(/slide(\d+)/)[1]));
+      let text = '';
+      for (const name of slideNames) {
+        const xml = await zip.files[name].async('string');
+        const matches = [...xml.matchAll(/<a:t>(.*?)<\/a:t>/g)];
+        text += matches.map(m => decodeXmlEntities(m[1])).join(' ') + '\n\n';
+      }
+      return text.trim();
+    }
+    throw new Error('فرمت پشتیبانی نمی‌شود');
+  }
+
   // ---------------- تب دسته‌بندی‌ها ----------------
   async function renderCategories() {
     const el = document.getElementById('tabContent');
@@ -158,8 +231,8 @@ const Admin = (() => {
         <h2>افزودن مطلب جدید</h2>
         <label>عنوان</label><input type="text" id="topicTitle">
         <label>دسته‌بندی</label><select id="topicCategory">${catOptions()}</select>
-        <label>فایل Word (.docx)</label>
-        <input type="file" id="docxInput" accept=".docx">
+        <label>فایل Word، PDF یا PowerPoint (.docx / .pdf / .pptx)</label>
+        <input type="file" id="docxInput" accept=".docx,.pdf,.pptx">
         <div id="docxStatus" class="note"></div>
         <textarea id="topicContent" rows="6" placeholder="متن استخراج‌شده اینجا نمایش داده می‌شود…"></textarea>
         <label>خلاصه (اختیاری)</label>
@@ -175,15 +248,16 @@ const Admin = (() => {
       </div>
       <div class="card"><h2>فهرست مطالب</h2><table id="topicTable"></table></div>`;
 
-    document.getElementById('docxInput').addEventListener('change', e => {
+    document.getElementById('docxInput').addEventListener('change', async e => {
       const file = e.target.files[0]; if (!file) return;
-      document.getElementById('docxStatus').textContent = 'در حال خواندن فایل…';
-      const reader = new FileReader();
-      reader.onload = () => mammoth.extractRawText({ arrayBuffer: reader.result }).then(r => {
-        document.getElementById('topicContent').value = r.value;
-        document.getElementById('docxStatus').textContent = '✓ متن استخراج شد (' + file.name + ')';
-      }).catch(() => document.getElementById('docxStatus').textContent = 'خطا در خواندن فایل.');
-      reader.readAsArrayBuffer(file);
+      const statusEl = document.getElementById('docxStatus');
+      statusEl.textContent = 'در حال خواندن فایل…';
+      try {
+        const text = await extractFileText(file);
+        document.getElementById('topicContent').value = text;
+        if (!document.getElementById('topicTitle').value) document.getElementById('topicTitle').value = file.name.replace(/\.[^.]+$/, '');
+        statusEl.textContent = '✓ متن استخراج شد (' + file.name + ')';
+      } catch (err) { statusEl.textContent = 'خطا در خواندن فایل: ' + err.message; }
     });
     document.getElementById('attachInput').addEventListener('change', e => {
       pendingAttachments = [];
@@ -280,11 +354,18 @@ const Admin = (() => {
     const data = await api('users.php');
     const rows = data.users.map(u => {
       const names = u.category_ids.map(id => { const c = state.categories.find(x => x.id == id); return c ? c.name : ''; }).filter(Boolean);
-      return `<tr><td><b>${escapeHtml(u.first_name + ' ' + u.last_name)}</b><div class="note" style="margin:0">کد پرسنلی: ${escapeHtml(u.personnel_code)}</div></td>
+      const lockBadge = u.is_locked ? ' <span class="pill" style="background:var(--danger);color:#fff">قفل‌شده</span>' : '';
+      const reactivateBtn = u.is_locked ? `<button class="btn gold" style="padding:5px 9px;font-size:11px;margin-left:4px" onclick="Admin.reactivateUser(${u.id})">فعال‌سازی مجدد</button>` : '';
+      return `<tr><td><b>${escapeHtml(u.first_name + ' ' + u.last_name)}</b>${lockBadge}<div class="note" style="margin:0">کد پرسنلی: ${escapeHtml(u.personnel_code)}</div></td>
         <td>${names.map(n => `<span class="pill">${escapeHtml(n)}</span>`).join(' ')}</td>
-        <td style="width:50px"><button class="btn danger" style="padding:5px 9px;font-size:11px" onclick="Admin.deleteUser(${u.id})">حذف</button></td></tr>`;
+        <td style="width:100px">${reactivateBtn}<button class="btn danger" style="padding:5px 9px;font-size:11px" onclick="Admin.deleteUser(${u.id})">حذف</button></td></tr>`;
     }).join('');
     document.getElementById('userTable').innerHTML = rows || '<tr><td class="note">کاربری ثبت نشده.</td></tr>';
+  }
+  async function reactivateUser(id) {
+    loading(true);
+    try { await api('users.php', { method: 'POST', body: JSON.stringify({ reactivate_id: id }) }); toast('حساب فعال شد.'); loadUsers(); }
+    catch (e) { toast(e.message); } finally { loading(false); }
   }
   async function addUser() {
     const first_name = document.getElementById('uFirst').value.trim();
@@ -360,6 +441,7 @@ const Admin = (() => {
     state.token = localStorage.getItem('session_token') || '';
 
     if (!state.url || !state.key) { showScreen('connect'); return; }
+    applyBranding();
 
     if (state.token) {
       loading(true, 'در حال اتصال…');
@@ -373,7 +455,7 @@ const Admin = (() => {
 
   return { init, saveConnection, resetConnection, login, logout, toggleTheme, showTab,
     addCategory, deleteCategory, saveTopic, deleteTopic, searchTopics, toggleCatPill,
-    addUser, submitBulk, deleteUser, saveSettings, regenerateKey };
+    addUser, submitBulk, deleteUser, reactivateUser, saveSettings, regenerateKey };
 })();
 
 window.addEventListener('DOMContentLoaded', Admin.init);
