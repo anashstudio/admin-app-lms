@@ -25,21 +25,48 @@ const Admin = (() => {
     return data;
   }
 
-  function saveConnection() {
+  async function saveConnection() {
     const raw = document.getElementById('connectionCodeInput').value.trim();
+    const errEl = document.getElementById('connectError');
+    errEl.textContent = '';
+    let decoded;
     try {
-      const decoded = JSON.parse(atob(raw));
+      decoded = JSON.parse(atob(raw));
       if (!decoded.url || !decoded.key) throw new Error();
-      state.url = decoded.url;
-      state.key = decoded.key;
-      localStorage.setItem('conn_url', state.url);
-      localStorage.setItem('conn_key', state.key);
-      document.getElementById('connectError').textContent = '';
-      showScreen('login');
-      applyBranding();
     } catch (e) {
-      document.getElementById('connectError').textContent = 'کد اتصال نامعتبر است.';
+      errEl.textContent = 'کد اتصال نامعتبر است — کامل و بدون فاصلهٔ اضافه کپی شده باشد.';
+      return;
     }
+
+    errEl.style.color = 'var(--muted)';
+    errEl.textContent = 'در حال بررسی دسترسی به سرور…';
+
+    // مرحله ۱: تست اتصال پایه (بدون هدر سفارشی، بدون کلید) — فقط می‌سنجد سرور اصلاً در دسترس است یا نه
+    try {
+      const res = await fetch(decoded.url + '/api/ping.php');
+      if (!res.ok) throw new Error('server_error');
+    } catch (e) {
+      errEl.style.color = 'var(--danger)';
+      errEl.textContent = 'اصلاً به این آدرس متصل نمی‌شویم — احتمالاً مشکل SSL/گواهی سرور یا اشتباه بودن آدرس دامنه است. آدرس API را در پنل بررسی کنید.';
+      return;
+    }
+
+    // مرحله ۲: تست کلید اتصال (همراه هدر سفارشی — اگر اینجا شکست خورد ولی مرحله ۱ موفق بود، مشکل CORS/کلید است)
+    state.url = decoded.url;
+    state.key = decoded.key;
+    try {
+      await api('branding.php');
+    } catch (e) {
+      errEl.style.color = 'var(--danger)';
+      errEl.textContent = 'سرور در دسترس است ولی درخواست همراه کلید رد شد — کد اتصال را دوباره از پنل بسازید و کامل پیست کنید. (جزئیات: ' + e.message + ')';
+      return;
+    }
+
+    localStorage.setItem('conn_url', state.url);
+    localStorage.setItem('conn_key', state.key);
+    errEl.textContent = '';
+    showScreen('login');
+    applyBranding();
   }
 
   async function applyBranding() {
