@@ -1,68 +1,80 @@
-@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
-:root{
-  --paper:#F3F1FB; --paper-dark:#EAE6F7; --card:#FFFFFF; --ink:#241F33; --deep:#6C4CE0; --deep2:#2C2150;
-  --gold:#6C4CE0; --gold-soft:#8F72EA; --gold-tint:#EDE9FB; --line:#E4E1F5; --muted:#7A7690; --danger:#D64545; --success:#2E9F6E;
-  --accent2:#1AA37A;
-  --shadow:0 1px 2px rgba(36,31,51,.05), 0 6px 18px rgba(36,31,51,.07);
-  --radius:18px;
-}
-[data-theme="dark"]{
-  --paper:#17151F; --paper-dark:#1E1B29; --card:#221F2E; --ink:#EDEAF8; --deep:#8B72EA; --deep2:#EDE9FB;
-  --gold:#8B72EA; --gold-soft:#A995F0; --gold-tint:#2E2745; --line:#332E45; --muted:#9A93B0; --danger:#E8776B; --success:#5FCB94;
-  --accent2:#3FC39A;
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 22px rgba(0,0,0,.45);
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0}
-body{font-family:'Vazirmatn',Tahoma,sans-serif;background:var(--paper);color:var(--ink);direction:rtl;overflow:hidden;
-  background-image:radial-gradient(circle at 100% 0%, var(--gold-tint) 0%, transparent 38%)}
-button,input,select,textarea{font-family:inherit}
-#app{height:100vh;display:flex;flex-direction:column}
-.screen{flex:1;overflow-y:auto;padding:18px}
-.hidden{display:none !important}
-.center-screen{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;
-  background-image:radial-gradient(circle at 18% 15%, var(--gold-tint) 0%, transparent 42%), radial-gradient(circle at 88% 85%, var(--gold-tint) 0%, transparent 38%)}
-h1{font-size:19px;margin:0 0 6px;font-weight:800}
-h2{font-size:14.5px;margin:0 0 12px;font-weight:800;display:flex;align-items:center;gap:8px}
-h2::before{content:'';width:4px;height:14px;border-radius:3px;background:var(--gold)}
-.note{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.9}
-label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:10px 0 5px}
-input[type=text],input[type=password],input[type=file],select,textarea{
-  width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--line);font-size:14px;background:#fff;color:var(--ink);transition:border-color .15s}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold-soft)}
-[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--paper-dark)}
-textarea{resize:vertical}
-button,.btn{background:var(--deep);color:var(--paper);border:none;border-radius:10px;padding:12px 18px;
-  font-size:13.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;
-  transition:opacity .15s,transform .1s}
-button:active,.btn:active{transform:scale(.98)}
-.btn.secondary{background:var(--card);color:var(--ink);border:1px solid var(--line)}
-.btn.danger{background:var(--danger);color:#fff}
-.btn.gold{background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:var(--deep2)}
-.btn.block{width:100%}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:16px;box-shadow:var(--shadow)}
-.pill{display:inline-flex;align-items:center;gap:4px;background:var(--gold-tint);color:var(--gold);border-radius:999px;
-  padding:6px 13px;font-size:12px;font-weight:700;border:1px solid transparent;cursor:pointer}
-.pill.active{background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:var(--deep2)}
-.logo-mark{width:52px;height:52px;border-radius:15px;background:linear-gradient(135deg,var(--gold-soft),var(--gold));
-  display:flex;align-items:center;justify-content:center;color:var(--deep2);font-weight:800;font-size:20px;margin-bottom:16px;box-shadow:var(--shadow)}
-.topbar{background:var(--deep);color:var(--paper);padding:16px 18px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;
-  box-shadow:0 2px 12px rgba(0,0,0,.12)}
-.tabbar{display:flex;background:var(--card);border-bottom:1px solid var(--line);flex-shrink:0;overflow-x:auto}
-.tabbar button{background:none;border:none;color:var(--muted);padding:13px 15px;font-size:12.5px;font-weight:700;
-  border-bottom:2.5px solid transparent;border-radius:0;display:flex;align-items:center;gap:6px;white-space:nowrap}
-.tabbar button svg{width:15px;height:15px;opacity:.8}
-.tabbar button.active{color:var(--gold);border-bottom-color:var(--gold)}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:10px 6px;border-bottom:1px solid var(--line);text-align:right}
-th{color:var(--muted);font-size:11px}
-tbody tr:hover{background:var(--paper-dark)}
-.codebox{font-family:monospace;background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:13px;word-break:break-all;font-size:12px;direction:ltr;text-align:left}
-.spinner{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--deep);color:var(--paper);
-  padding:11px 20px;border-radius:999px;font-size:12.5px;z-index:99;opacity:0;transition:opacity .25s;box-shadow:var(--shadow)}
-.toast.show{opacity:1}
-.filerow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--paper);border:1px solid var(--line);
-  border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:12.5px}
-.dropzone{border:1.5px dashed var(--line);border-radius:12px;padding:20px;text-align:center;background:var(--paper);cursor:pointer}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>پنل مدیریت</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- صفحه اتصال به سرور -->
+  <div id="screen-connect" class="screen center-screen">
+    <div class="logo-mark">م</div>
+    <h1 id="brandTitle">پنل مدیریت</h1>
+    <p class="note" style="max-width:300px">برای اولین بار، کد اتصال سیستم را که از پنل تنظیمات وب‌سایت گرفته‌اید وارد کنید.</p>
+    <div style="width:100%;max-width:300px">
+      <textarea id="connectionCodeInput" rows="3" placeholder="کد اتصال را اینجا جای‌گذاری کنید…"></textarea>
+      <div id="connectError" class="note" style="color:var(--danger)"></div>
+      <button class="btn block" style="margin-top:10px" onclick="Admin.saveConnection()">اتصال</button>
+    </div>
+  </div>
+
+  <!-- صفحه ورود -->
+  <div id="screen-login" class="screen center-screen hidden">
+    <div class="logo-mark">م</div>
+    <h1 id="loginBrand">پنل مدیریت</h1>
+    <p class="note">ورود مخصوص مدیران سیستم</p>
+    <div style="width:100%;max-width:300px;text-align:right">
+      <label>کد پرسنلی</label>
+      <input type="text" id="loginPersonnel">
+      <label>کد ملی</label>
+      <input type="password" id="loginNational">
+      <div id="loginError" class="note" style="color:var(--danger)"></div>
+      <button class="btn block" style="margin-top:12px" onclick="Admin.login()">ورود</button>
+      <button class="btn secondary block" style="margin-top:8px" onclick="Admin.resetConnection()">تغییر سرور متصل</button>
+    </div>
+  </div>
+
+  <!-- برنامه اصلی -->
+  <div id="screen-main" class="hidden" style="display:flex;flex-direction:column;height:100%">
+    <div class="topbar">
+      <span id="mainBrand" style="font-weight:800;font-size:14px"></span>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button onclick="Admin.toggleTheme()" class="btn secondary" style="padding:7px 11px;font-size:11px;border-color:rgba(244,239,228,.3);color:var(--paper);background:rgba(255,255,255,.06)">🌓</button>
+        <button onclick="Admin.logout()" class="btn secondary" style="padding:7px 11px;font-size:11px;border-color:rgba(244,239,228,.3);color:var(--paper);background:rgba(255,255,255,.06)">خروج</button>
+      </div>
+    </div>
+    <div class="tabbar">
+      <button data-tab="categories" onclick="Admin.showTab('categories')" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>
+        دسته‌بندی‌ها</button>
+      <button data-tab="topics" onclick="Admin.showTab('topics')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v5h5M6 3h8l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M8 13h8M8 17h5"/></svg>
+        مطالب</button>
+      <button data-tab="users" onclick="Admin.showTab('users')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.7"/><path d="M15.5 13.2c2.7-.2 5 1.7 5.6 4"/></svg>
+        کاربران</button>
+      <button data-tab="settings" onclick="Admin.showTab('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+        تنظیمات</button>
+    </div>
+    <div class="screen" id="tabContent"></div>
+  </div>
+
+  <div id="loading" class="screen center-screen hidden">
+    <div class="spinner"></div>
+    <div class="note" id="loadingText">در حال بارگذاری…</div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.7.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
